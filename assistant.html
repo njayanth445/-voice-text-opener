@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 50px;
+        }
+        button {
+            background: #ff4444;
+            color: white;
+            font-size: 24px;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px;
+        }
+        button:hover {
+            transform: scale(1.1);
+            background: #cc0000;
+        }
+        .status {
+            margin: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .cmd-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎤 Voice Assistant</h1>
+    <p>Click the button and speak a command</p>
+    
+    <button id="micBtn" onclick="startListening()">🎤 Click & Speak</button>
+    
+    <div class="status" id="status">
+        Ready! Click the button above
+    </div>
+    
+    <div id="result"></div>
+    
+    <h3>Quick Links (click to open):</h3>
+    <div>
+        <button class="cmd-btn" onclick="openUrl('https://youtube.com')">YouTube</button>
+        <button class="cmd-btn" onclick="openUrl('https://google.com')">Google</button>
+        <button class="cmd-btn" onclick="openUrl('https://facebook.com')">Facebook</button>
+        <button class="cmd-btn" onclick="openUrl('https://instagram.com')">Instagram</button>
+        <button class="cmd-btn" onclick="openUrl('https://twitter.com')">Twitter</button>
+        <button class="cmd-btn" onclick="openUrl('https://github.com')">GitHub</button>
+        <button class="cmd-btn" onclick="openUrl('https://amazon.com')">Amazon</button>
+        <button class="cmd-btn" onclick="openUrl('https://netflix.com')">Netflix</button>
+        <button class="cmd-btn" onclick="openUrl('https://spotify.com')">Spotify</button>
+        <button class="cmd-btn" onclick="openUrl('https://gmail.com')">Gmail</button>
+    </div>
+
+    <script>
+        function openUrl(url) {
+            window.open(url, '_blank');
+            document.getElementById('result').innerHTML = `✅ Opened: ${url}`;
+        }
+        
+        function startListening() {
+            const status = document.getElementById('status');
+            const micBtn = document.getElementById('micBtn');
+            
+            if (!('webkitSpeechRecognition' in window)) {
+                status.innerHTML = '❌ Please use Google Chrome browser';
+                return;
+            }
+            
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            
+            status.innerHTML = '🎤 Listening... Speak now!';
+            micBtn.style.background = '#00cc44';
+            
+            recognition.start();
+            
+            recognition.onresult = (event) => {
+                const command = event.results[0][0].transcript.toLowerCase();
+                status.innerHTML = `You said: "${command}"`;
+                document.getElementById('result').innerHTML = `🗣️ "${command}"<br>Opening...`;
+                
+                // Check for websites
+                if (command.includes('youtube')) openUrl('https://youtube.com');
+                else if (command.includes('google')) openUrl('https://google.com');
+                else if (command.includes('facebook')) openUrl('https://facebook.com');
+                else if (command.includes('instagram')) openUrl('https://instagram.com');
+                else if (command.includes('twitter')) openUrl('https://twitter.com');
+                else if (command.includes('github')) openUrl('https://github.com');
+                else if (command.includes('amazon')) openUrl('https://amazon.com');
+                else if (command.includes('netflix')) openUrl('https://netflix.com');
+                else if (command.includes('spotify')) openUrl('https://spotify.com');
+                else if (command.includes('gmail')) openUrl('https://gmail.com');
+                else if (command.includes('time')) {
+                    const now = new Date();
+                    document.getElementById('result').innerHTML = `🕐 Time: ${now.toLocaleTimeString()}`;
+                    const speech = new SpeechSynthesisUtterance(`The time is ${now.toLocaleTimeString()}`);
+                    window.speechSynthesis.speak(speech);
+                }
+                else {
+                    openUrl(`https://www.google.com/search?q=${encodeURIComponent(command)}`);
+                }
+                
+                micBtn.style.background = '#ff4444';
+                setTimeout(() => {
+                    status.innerHTML = 'Ready! Click button to speak again';
+                }, 2000);
+            };
+            
+            recognition.onerror = () => {
+                status.innerHTML = '❌ Could not hear you. Try again.';
+                micBtn.style.background = '#ff4444';
+            };
+        }
+    </script>
+</body>
+</html>
